@@ -27,9 +27,10 @@ def _download_video(video_link: str, path: str):
         f.write(vid.content)
     logger.debug("Video downloaded")
 
-def download():
+def download(epizode, path: str):
     for epizode in tqdm(range(33, 149)):
         page_url = "https://jut.su/hunter-hunter/episode-{0}.html".format(epizode)
+        video_link = None
         try:
             video_link = _get_video_url(page_url)
         except Exception as e:

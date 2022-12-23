@@ -1,28 +1,23 @@
 import requests
 from bs4 import BeautifulSoup
-from typing import NamedTuple
-from enum import Enum
 
 
+class Anime:
 
-class Anime(NamedTuple):
-    title: str
-    link: str
-
-
-    HEADERS = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
-    }
-
-    def __init__(self) -> None:
-        self.description = self._get_description()
-        self.image = self._get_image()
+    def __init__(self, title, link) -> None:
+        self.title = title
+        self.link = link
+        self.HEADERS = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
+        }
+    
 
     def _get_description(self):
         r = requests.get(self.link, headers=self.HEADERS)
         soup = BeautifulSoup(r.text, 'html.parser')
         description = [span for span in soup.find('p', class_="under_video uv_rounded_bottom the_hildi").find_all("span")][0]
         return description
+
 
     def _get_image(self):
         r = requests.get(self.link, headers=self.HEADERS)
@@ -47,14 +42,15 @@ class Anime(NamedTuple):
     
     def _download(self, video_link: str, path: str):
         vid = requests.get(video_link, headers=self.HEADERS)
-        with open('{0}.mp4'.format(path), 'wb') as f:
+        with open(path, 'wb') as f:
             f.write(vid.content)
         
         
     def download(self, epizode, path: str):
         page_url = f"{self.link}episode-{epizode}.html"
         video_link = self._get_video_url(page_url)
-        self._download(video_link, path=path)
+        video_name = video_link.split('/')[-1].split("?")[0]
+        self._download(video_link, path=path+video_name)
 
 
         
@@ -64,7 +60,8 @@ class Anime(NamedTuple):
         
 
 class Jutsu:
-    def __init__(self):
+
+    def __init__(self) -> None:
         pass
 
     
