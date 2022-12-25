@@ -55,7 +55,7 @@ class Anime:
     def _get_video_url(self, page_url: str) -> str:
         r = requests.get(page_url, headers=self.HEADERS)
         soup = BeautifulSoup(r.text, 'html.parser')
-        video_link = soup.find(id='my-player').find_all('source')[1].get('src')
+        video_link = soup.find(id='my-player').find_all('source')[3].get('src')
         return video_link
 
     def _download(self, video_link: str, path: str):

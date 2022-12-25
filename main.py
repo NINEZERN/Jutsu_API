@@ -26,11 +26,11 @@ def parse_epizode(user_input) -> list[int]:
                     x = int(sx)
                     y = int(sy) + 1
                     for v in range(x, y):
-                        choosed.append(v - 1)
+                        choosed.append(v)
             elif not r.isdigit() and r.strip() != '':
                 raise ChoiceError("Your input is not valid")
             elif r != '':
-                choosed.append(int(r) - 1)
+                choosed.append(int(r))
     return choosed
 
 
@@ -60,20 +60,24 @@ def main():
 
     # anime
     animes = jutsu.search(input("Write an anime ->"))
+    if animes:
+        _print_anime(animes)
+        anime = animes[int(input(f"Write an index btween of 1 - {len(animes)} ->")) - 1]
+        print(anime.link)
+    else:
+        raise ChoiceError("Fuck u docker")
     # animes = jutsu.search('хантер')
-    _print_anime(animes=animes)
-    anime = animes[int(input(f"Write an index btween of 1 - {len(animes)} ->")) - 1]
+    # _print_anime(animes=animes)
+    # anime = animes[int(input(f"Write an index btween of 1 - {len(animes)} ->")) - 1]
 
     # seasone
     seasons = anime.get_seasons()
+    print(seasons)
     if seasons:
         _print_anime(seasons)
         season = seasons[int(input(f"Write an index btween of 1 - {len(seasons)} ->")) - 1]
         print(season.link)
 
-    # episode
-    ep = anime.get_episodes(season)
-    print(ep)
     episode = input("Write an episode ->")
     episodes = parse_epizode(episode)
 
