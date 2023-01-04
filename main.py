@@ -19,7 +19,7 @@ def parse_epizode(user_input) -> list[int]:
     # animes = targets[:]
     else:
         for r in user_input.split(','):
-            r = r.strip()
+            r = r.strip().replace(' ', '')
             if r.find('-') != -1:
                 (sx, sy) = r.split('-')
                 if sx.isdigit() and sy.isdigit():
@@ -38,7 +38,7 @@ def tes_episodes():
     jutsu = Jutsu()
 
     # anime
-    animes = jutsu.search("клинок")
+    animes = jutsu.search("хантер")
     anime = animes[0]
 
     # seasone
@@ -50,7 +50,7 @@ def tes_episodes():
         # print(season.link)
 
     # episode
-    ep = anime.get_episodes(seasons[season])
+    ep = anime.get_episodes()
     for i in ep:
         print(i)
 
@@ -76,14 +76,14 @@ def main():
     if seasons:
         _print_anime(seasons)
         season = seasons[int(input(f"Write an index btween of 1 - {len(seasons)} ->")) - 1]
-        print(season.link)
+        print(season)
 
     episode = input("Write an episode ->")
     episodes = parse_epizode(episode)
 
     for episode in tqdm(episodes):
         if seasons:
-            anime.download(episode=episode, path="Anime/", season=season.link)
+            anime.download(episode=episode, path="Anime/", season=season)
         else:
             anime.download(episode=episode, path="Anime/")
 

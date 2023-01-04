@@ -3,3 +3,4 @@
 __pycache__/
 *.py[cod]
 main_bc.py
+test.py

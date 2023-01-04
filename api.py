@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from requests import Response
-from typing import NamedTuple, Union
+from typing import NamedTuple
 from fake_useragent import UserAgent
 
 
@@ -38,10 +38,13 @@ class Anime:
         image = soup.find("div", class_="all_anime_title").get("style").split(")")[0].split("(")[-1].replace("'", "")
         return image
 
-    def get_episodes(self, season: Season) -> list[Episode]:
-        r = requests.get(season.link, headers=self.HEADERS)
+    def get_episodes(self, season: Season = None) -> list[Episode]:
+        if season is not None:
+            r = requests.get(season.link, headers=self.HEADERS)
+        else:
+            r = requests.get(self.link, headers=self.HEADERS)
         soup = BeautifulSoup(r.text, 'html.parser')
-        episodes = [Episode(title=episode.text, link=episode.get("href")) for episode in
+        episodes = [Episode(title=episode.text, link=episode.get("href").split("/")) for episode in
                     soup.find('div', class_="watch_l").find_all("a")][2:]
         return episodes
 
@@ -63,11 +66,11 @@ class Anime:
         with open(path, 'wb') as f:
             f.write(vid.content)
 
-    def download(self, episode: int, path: str, season: int = None):
+    def download(self, episode: int, path: str, season: Season = None):
         if season is None:
             page_url = f"{self.link}episode-{episode}.html"
         else:
-            page_url = f"{season}episode-{episode}.html"
+            page_url = f"{season.link}episode-{episode}.html"
         video_link = self._get_video_url(page_url)
         video_name = video_link.split('/')[-1].split("?")[0]
         self._download(video_link, path=path + video_name)
