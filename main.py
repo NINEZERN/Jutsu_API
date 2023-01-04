@@ -76,7 +76,7 @@ def main():
     if seasons:
         _print_anime(seasons)
         season = seasons[int(input(f"Write an index btween of 1 - {len(seasons)} ->")) - 1]
-        print(season)
+        print("season "+str(season))
 
     episode = input("Write an episode ->")
     episodes = parse_epizode(episode)
