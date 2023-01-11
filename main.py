@@ -65,7 +65,7 @@ def main():
         anime = animes[int(input(f"Write an index btween of 1 - {len(animes)} ->")) - 1]
         print(anime.link)
     else:
-        raise ChoiceError("Fuck u docker")
+        raise ChoiceError("You wrote an invalid episode")
     # animes = jutsu.search('хантер')
     # _print_anime(animes=animes)
     # anime = animes[int(input(f"Write an index btween of 1 - {len(animes)} ->")) - 1]
