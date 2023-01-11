@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from enum import Enum
 from requests import Response
 from typing import NamedTuple
 from fake_useragent import UserAgent
@@ -13,6 +14,13 @@ class Episode(NamedTuple):
 class Season(NamedTuple):
     title: str
     link: str
+
+class Quality(Enum):
+    HIGHT = 0
+
+
+
+
 
 
 class Anime:
@@ -39,14 +47,15 @@ class Anime:
         return image
 
     def get_episodes(self, season: Season = None) -> list[Episode]:
-        if season is not None:
-            r = requests.get(season.link, headers=self.HEADERS)
-        else:
-            r = requests.get(self.link, headers=self.HEADERS)
+        
+        r = requests.get(season.link if season else self.link, headers=self.HEADERS)
         soup = BeautifulSoup(r.text, 'html.parser')
-        episodes = [Episode(title=episode.text, link=episode.get("href").split("/")) for episode in
-                    soup.find('div', class_="watch_l").find_all("a")][2:]
-        return episodes
+        last_episode = soup.find("div", class_="watch_l").find_all('a')
+        last_episodes = []
+        for i in last_episode:
+            if 'серия' in i.text:
+                last_episodes.append(i)
+        return last_episodes[-1].text.split(' ')[-2]
 
     def get_seasons(self):
         r = requests.get(self.link, headers=self.HEADERS)
@@ -54,11 +63,22 @@ class Anime:
         seasons = [Season(link="https://jut.su" + season.find("a").get("href"), title=season.find("a").text) for season
                    in soup.find_all("div", class_="the_invis")]
         return seasons
-
-    def _get_video_url(self, page_url: str) -> str:
+        
+        
+    def _get_video_url(self, page_url: str, quality) -> str:
         r = requests.get(page_url, headers=self.HEADERS)
         soup = BeautifulSoup(r.text, 'html.parser')
-        video_link = soup.find(id='my-player').find_all('source')[3].get('src')
+        quality_dict = {
+            '1080': 0,
+            '720': 1,
+            '480': 2,
+            '360': 3
+        }
+        quality = str(quality)
+        print (quality)
+        print (quality_dict[quality])
+        video_link = soup.find(id='my-player').find_all('source')[quality_dict.get(quality, 1)].get('src')
+        print (video_link)
         return video_link
 
     def _download(self, video_link: str, path: str):
@@ -66,12 +86,12 @@ class Anime:
         with open(path, 'wb') as f:
             f.write(vid.content)
 
-    def download(self, episode: int, path: str, season: Season = None):
+    def download(self, episode: int, path: str, season: Season = None, quality = 720):
         if season is None:
             page_url = f"{self.link}episode-{episode}.html"
         else:
             page_url = f"{season.link}episode-{episode}.html"
-        video_link = self._get_video_url(page_url)
+        video_link = self._get_video_url(page_url, quality=quality)
         video_name = video_link.split('/')[-1].split("?")[0]
         self._download(video_link, path=path + video_name)
 

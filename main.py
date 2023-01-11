@@ -38,21 +38,21 @@ def tes_episodes():
     jutsu = Jutsu()
 
     # anime
-    animes = jutsu.search("хантер")
-    anime = animes[0]
+    animes = jutsu.search("джо джо")
+    # _print_anime(animes)
+    anime = animes[1]
 
     # seasone
     seasons = anime.get_seasons()
     if seasons:
-        season = 1
+        season = seasons[5]
         # _print_anime(seasons)
         # season = seasons[int(input(f"Write an index btween of 1 - {len(seasons)} ->")) - 1]
         # print(season.link)
 
     # episode
-    ep = anime.get_episodes()
-    for i in ep:
-        print(i)
+    ep = anime.get_episodes(season=season)
+    print (ep.text.split(' ')[-2])
 
 
 def main():
@@ -72,20 +72,23 @@ def main():
 
     # seasone
     seasons = anime.get_seasons()
-    print(seasons)
     if seasons:
         _print_anime(seasons)
         season = seasons[int(input(f"Write an index btween of 1 - {len(seasons)} ->")) - 1]
         print("season "+str(season))
-
-    episode = input("Write an episode ->")
+        last_episode = anime.get_episodes(season=season)
+    else:
+        last_episode = anime.get_episodes()
+    episode = input(f"Write an episode (1 - {last_episode}) ->")
     episodes = parse_epizode(episode)
+
+    quality = input("Write a quality [360, 480, 720, 1080] ->")
 
     for episode in tqdm(episodes):
         if seasons:
-            anime.download(episode=episode, path="Anime/", season=season)
+            anime.download(episode=episode, path="Anime/", season=season, quality=quality)
         else:
-            anime.download(episode=episode, path="Anime/")
+            anime.download(episode=episode, path="Anime/", quality=quality)
 
 
 if __name__ == "__main__":
